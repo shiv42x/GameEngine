@@ -67,8 +67,7 @@ void Vec2::operator /= (const float val)
 
 double Vec2::dist(const Vec2& rhs) const
 {
-	Vec2 d(x - rhs.x, y - rhs.y);
-	return sqrtf((d.x * d.x) + (d.y * d.y));
+	return sqrtf((x - rhs.x) * (x - rhs.x) + (y - rhs.y) * (y - rhs.y));
 }
 
 double Vec2::length() const
@@ -85,9 +84,5 @@ void Vec2::normalize()
 
 std::ostream& operator << (std::ostream& stream, const Vec2& vec)
 {
-	return stream
-		<< vec.x
-		<< " "
-		<< vec.y
-		<< '\n';
+	return stream << vec.x << " " << vec.y << '\n';
 }

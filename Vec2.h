@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 class Vec2
 {
 public:
@@ -8,6 +9,8 @@ public:
 
 	Vec2();
 	Vec2(float xin, float yin);
+
+	friend std::ostream& operator << (std::ostream& stream, const Vec2& vec);
 
 	bool operator == (const Vec2& rhs) const;
 	bool operator != (const Vec2& rhs) const;
