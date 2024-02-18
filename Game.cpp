@@ -13,7 +13,7 @@ void Game::init(const std::string& path)
 	// TODO: read in config here
 	// use premade PlayerConfig, EnemyConfig, BulletConfig vars
 	std::ifstream fin(path);
-	std::cout << "Loaded?";
+
 	// fin >> m_playerConfig.SR >> m_playerConfig.CR
 
 	m_window.create(sf::VideoMode(1280, 720), "ECS Geometry Wars");
