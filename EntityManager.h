@@ -17,7 +17,6 @@ private:
 	void removeDeadEntities(EntityVec& vec);
 
 public:
-
 	EntityManager();
 
 	void update();

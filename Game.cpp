@@ -26,7 +26,7 @@ void Game::run()
 	// TODO: add pause functionality
 	// some systems should function while paused (rendering)
 	// some systems shouldn't
-	while (m_window.isOpen())
+	while (m_window.isOpen() && m_running)
 	{
 		m_entities.update();
 
