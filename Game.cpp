@@ -13,7 +13,7 @@ void Game::init(const std::string& path)
 	// TODO: read in config here
 	// use premade PlayerConfig, EnemyConfig, BulletConfig vars
 	std::ifstream fin(path);
-
+	std::cout << "Loaded?";
 	// fin >> m_playerConfig.SR >> m_playerConfig.CR
 
 	m_window.create(sf::VideoMode(1280, 720), "ECS Geometry Wars");
@@ -26,17 +26,19 @@ void Game::run()
 	// TODO: add pause functionality
 	// some systems should function while paused (rendering)
 	// some systems shouldn't
+	while (m_window.isOpen())
+	{
+		m_entities.update();
 
-	m_entities.update();
+		sEnemySpawner();
+		sMovement();
+		sCollision();
+		sUserInput();
+		sRender();
 
-	sEnemySpawner();
-	sMovement();
-	sCollision();
-	sUserInput();
-	sRender();
-
-	// increment current frame
-	m_currentFrame++;
+		// increment current frame
+		m_currentFrame++;
+	}
 }
 
 void Game::setPaused(bool paused)

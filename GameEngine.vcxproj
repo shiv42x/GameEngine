@@ -32,6 +32,9 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="Vec2.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="config.txt" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
