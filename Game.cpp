@@ -34,6 +34,7 @@ void Game::run()
 		sMovement();
 		sCollision();
 		sUserInput();
+		sLifeSpan();
 		sRender();
 
 		// increment current frame
@@ -80,7 +81,7 @@ void Game::spawnEnemy()
 	m_lastEnemySpawnTime = m_currentFrame; 
 }
 
-void Game::spawnSmallEnemies(std::shared_ptr<Entity> entity)
+void Game::spawnSmallEnemies(std::shared_ptr<Entity> spawningEntity)
 {
 	// TODO: spawn small enemies at location of input enemy e
 	// when create smaller enemy, have to read values of orig enemy
@@ -89,24 +90,41 @@ void Game::spawnSmallEnemies(std::shared_ptr<Entity> entity)
 	// - small enemies are worth double points of original enemy
 }
 
-void Game::spawnBullet(std::shared_ptr<Entity> entity, const Vec2& mousePos)
+void Game::spawnBullet(std::shared_ptr<Entity> spawningEntity, const Vec2& mousePos)
 {
 	// TODO: implement the spawning of a bullet which travels to target
 	// bullet speed is given as scalar speed
 	// must set velocity by using formula
+	
+	float bulletSpeed = 10.0f;
+	Vec2 velocityVec = (mousePos - spawningEntity->cTransform->pos);
+	velocityVec.normalize();
+	velocityVec *= bulletSpeed;
+
+	auto bullet = m_entities.addEntity("bullet");
+	
+	bullet->cTransform = std::make_shared<CTransform>(
+		spawningEntity->cTransform->pos,
+		velocityVec, 
+		0.0f
+	);
+
+	bullet->cShape = std::make_shared<CShape>(
+		10.0f, 50, sf::Color(50, 50, 50),
+		sf::Color(255, 255, 255), 2
+	);
+
+	// lifespan of 60 = 1 sec because 60fps framerate limit
+	bullet->cLifespan = std::make_shared<CLifespan>(300);
 }
 
-void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity)
+void Game::spawnSpecialWeapon(std::shared_ptr<Entity> spawningEntity)
 {
 	// TODO: implement special weapon
 }
 
 void Game::sMovement()
 {
-	// TODO: implement all entity movement in this function
-	// should read the m_player->cInput component to determine if the player is moving
-
-
 	// Player
 	Vec2 playerVelocity(0.0, 0.0);
 
@@ -126,20 +144,35 @@ void Game::sMovement()
 	{
 		playerVelocity.x += 1.0f;
 	}
-	// scale movespeed, then add to pos in plane
+
+	// scale movespeed, then add velocity vector to pos
 	playerVelocity *= m_player->cTransform->moveSpeedMulti;
 	m_player->cTransform->pos += playerVelocity;
+
+	// move entities
+	for (auto e : m_entities.getEntities()) {
+		e->cTransform->pos += e->cTransform->velocity;
+	}
 }
 
 void Game::sLifeSpan()
 {
-	// for all entities:
-	// if entity has no lifespan component, skip it
-	// if entity has > 0 remaining lifespan, subtract 1
-	// if it has lifespan and is alive,
-	//		scale alpha channel properly
-	// if it has lifespan and its time is up, 
-	//		destroy entity
+	// TODO: scale alpha channel with remaining lifespan
+	
+	for (auto e : m_entities.getEntities())
+	{
+		if (e->cLifespan)
+		{
+			if (e->cLifespan->remaining > 0)
+			{
+				e->cLifespan->remaining--;
+			}
+			else
+			{
+				e->destroy();
+			}
+		}
+	}
 }
 
 void Game::sCollision()
@@ -172,26 +205,30 @@ void Game::sRender()
 	// draw entity's sf::CircleShape
 	m_window.draw(m_player->cShape->circle);
 
+	for (auto e : m_entities.getEntities())
+	{
+		e->cShape->circle.setPosition(
+			e->cTransform->pos.x,
+			e->cTransform->pos.y
+			);
+		e->cShape->circle.setRotation(
+			e->cTransform->angle
+		);
+		m_window.draw(e->cShape->circle);
+	}
 	m_window.display();
 }
 
 void Game::sUserInput()
 {
-	// TODO: handle user input
-	// note only set player's input component vars here
-	// dont implement players movement logic here
-	// movement system will read vars set here
-
 	sf::Event event;
 	while (m_window.pollEvent(event))
 	{
-		// when window is closed
 		if (event.type == sf::Event::Closed)
 		{
 			m_running = false;
 		}
 
-		// when key pressed
 		if (event.type == sf::Event::KeyPressed)
 		{
 			switch (event.key.code)
@@ -236,8 +273,7 @@ void Game::sUserInput()
 		{
 			if (event.mouseButton.button == sf::Mouse::Left)
 			{
-				std::cout << "Left mouse clicked at " << event.mouseButton.x << ", " << event.mouseButton.y << '\n';
-				// call spawnBullet
+				spawnBullet(m_player, Vec2(event.mouseButton.x, event.mouseButton.y));
 			}
 
 			if (event.mouseButton.button == sf::Mouse::Right)

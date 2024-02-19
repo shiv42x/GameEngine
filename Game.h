@@ -37,9 +37,9 @@ private:
 
 	void spawnPlayer();
 	void spawnEnemy();
-	void spawnSmallEnemies(std::shared_ptr<Entity> entity);
-	void spawnBullet(std::shared_ptr<Entity> entity, const Vec2& mousePos);
-	void spawnSpecialWeapon(std::shared_ptr<Entity> entity);
+	void spawnSmallEnemies(std::shared_ptr<Entity> spawningEntity);
+	void spawnBullet(std::shared_ptr<Entity> spawningEntity, const Vec2& mousePos);
+	void spawnSpecialWeapon(std::shared_ptr<Entity> spawningEntity);
 
 public:
 	Game(const std::string& configFile);
