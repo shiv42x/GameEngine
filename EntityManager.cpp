@@ -1,4 +1,5 @@
 #include "EntityManager.h"
+#include <algorithm>
 
 EntityManager::EntityManager()
 	: m_totalEntities(0)
@@ -6,9 +7,15 @@ EntityManager::EntityManager()
 
 void EntityManager::update()
 {
-	// TODO: add entities from m_entitiesToAdd
-	// - add them to vector of all entities
-	// - add them to vector inside the map with tag as key
+	// to avoid iterator invalidation
+	// entities to add are in m_entitiesToAdd, 
+	// then in here, transfer entities from m_entitiesToAdd to m_entities vector
+	for (auto e : m_entitiesToAdd)
+	{
+		m_entities.push_back(e);
+		m_entityMap[e->tag()].push_back(e);
+	}
+	m_entitiesToAdd.clear();
 
 	// remove dead entities from vector of all entities
 	removeDeadEntities(m_entities);
@@ -20,10 +27,10 @@ void EntityManager::update()
 	}
 }
 
-void EntityManager::removeDeadEntities(EntityVec& Vec)
+void EntityManager::removeDeadEntities(EntityVec& vec)
 {
-	// TODO: remove all dead entities from the input vector
-	// this is called by the update() function
+	// remove all dead entities from the input vector
+	std::erase_if(vec, [](auto& e) { return !e->isAlive(); });
 }
 
 std::shared_ptr<Entity> EntityManager::addEntity(const std::string& tag)
@@ -40,9 +47,7 @@ const EntityVec& EntityManager::getEntities()
 
 const EntityVec& EntityManager::getEntities(const std::string& tag)
 {
-	// TODO: incorrect, return correct vector from map
-	// return map indexed by tag
-	return m_entities;
+	return m_entityMap[tag];
 }
 
 const std::map<std::string, EntityVec>& EntityManager::getEntityMap()

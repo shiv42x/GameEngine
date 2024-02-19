@@ -59,7 +59,7 @@ void Game::spawnPlayer()
 	// Give entity Transform so it spawns at 200, 200 with velo 1, 1, angle 0
 	entity->cTransform = std::make_shared<CTransform>(
 		Vec2(200.0f, 200.0f),
-		Vec2(1.0f, 1.0f), 0.0f);
+		Vec2(0.0f, 0.0f), 0.0f);
 
 	// Give entity shape 
 	entity->cShape = std::make_shared<CShape>(
@@ -106,10 +106,29 @@ void Game::sMovement()
 	// TODO: implement all entity movement in this function
 	// should read the m_player->cInput component to determine if the player is moving
 
-	// Sample
-	m_player->cTransform->pos.x += m_player->cTransform->velocity.x;
-	m_player->cTransform->pos.y += m_player->cTransform->velocity.y;
 
+	// Player
+	Vec2 playerVelocity(0.0, 0.0);
+
+	if (m_player->cInput->up)
+	{
+		playerVelocity.y -= 1.0f;
+	}
+	if (m_player->cInput->left)
+	{
+		playerVelocity.x -= 1.0f;
+	}
+	if (m_player->cInput->down)
+	{
+		playerVelocity.y += 1.0f;
+	}
+	if (m_player->cInput->right)
+	{
+		playerVelocity.x += 1.0f;
+	}
+	// scale movespeed, then add to pos in plane
+	playerVelocity *= m_player->cTransform->moveSpeedMulti;
+	m_player->cTransform->pos += playerVelocity;
 }
 
 void Game::sLifeSpan()
@@ -178,11 +197,17 @@ void Game::sUserInput()
 			switch (event.key.code)
 			{
 			case sf::Keyboard::W:
-				std::cout << "W pressed\n";
-				// TODO: set player's input component "up" to true
+				m_player->cInput->up = true;
 				break;
-			
-			// TODO: add remaining case statements
+			case sf::Keyboard::A:
+				m_player->cInput->left = true;
+				break;
+			case sf::Keyboard::S:
+				m_player->cInput->down = true;
+				break;
+			case sf::Keyboard::D:
+				m_player->cInput->right = true;
+				break;
 			default: break;
 			}
 		}
@@ -192,11 +217,17 @@ void Game::sUserInput()
 			switch (event.key.code)
 			{
 			case sf::Keyboard::W:
-				std::cout << "W released\n";
-				// TODO: set player's input component "up" to false
+				m_player->cInput->up = false;
 				break;
-
-				// TODO: add remaining case statements
+			case sf::Keyboard::A:
+				m_player->cInput->left = false;
+				break;
+			case sf::Keyboard::S:
+				m_player->cInput->down = false;
+				break;
+			case sf::Keyboard::D:
+				m_player->cInput->right = false;
+				break;
 			default: break;
 			}
 		}

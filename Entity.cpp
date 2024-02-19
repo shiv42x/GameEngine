@@ -5,7 +5,7 @@ Entity::Entity(const std::string& tag, const size_t id)
 	, m_id(id)
 {}
 
-bool Entity::isActive() const
+bool Entity::isAlive() const
 {
 	return m_alive;
 }

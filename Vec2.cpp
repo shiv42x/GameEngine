@@ -77,12 +77,16 @@ double Vec2::length() const
 
 void Vec2::normalize()
 {
-	double L = std::sqrt((x * x) + (y * y));
+	float L = std::sqrt((x * x) + (y * y));
 	x = x / L;
 	y = y / L;
 }
 
 std::ostream& operator << (std::ostream& stream, const Vec2& vec)
 {
-	return stream << vec.x << " " << vec.y << '\n';
+	return stream 
+		<< vec.x 
+		<< " " 
+		<< vec.y
+		<< '\n';
 }
