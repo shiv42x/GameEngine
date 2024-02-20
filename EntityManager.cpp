@@ -10,7 +10,7 @@ void EntityManager::update()
 	// to avoid iterator invalidation
 	// entities to add are in m_entitiesToAdd, 
 	// then in here, transfer entities from m_entitiesToAdd to m_entities vector
-	for (auto e : m_entitiesToAdd)
+	for (auto& e : m_entitiesToAdd)
 	{
 		m_entities.push_back(e);
 		m_entityMap[e->tag()].push_back(e);

@@ -150,14 +150,14 @@ void Game::sMovement()
 	m_player->cTransform->pos += playerVelocity;
 
 	// move entities
-	for (auto e : m_entities.getEntities()) {
+	for (auto& e : m_entities.getEntities()) {
 		e->cTransform->pos += e->cTransform->velocity;
 	}
 }
 
 void Game::sLifeSpan()
 {
-	for (auto e : m_entities.getEntities())
+	for (auto& e : m_entities.getEntities())
 	{
 		if (e->cLifespan)
 		{
