@@ -110,12 +110,12 @@ void Game::spawnBullet(std::shared_ptr<Entity> spawningEntity, const Vec2& mouse
 	);
 
 	bullet->cShape = std::make_shared<CShape>(
-		10.0f, 50, sf::Color(50, 50, 50),
-		sf::Color(255, 255, 255), 2
+		10.0f, 50, sf::Color(125, 125, 125, 255),
+		sf::Color(255, 255, 255, 255), 2
 	);
 
 	// lifespan of 60 = 1 sec because 60fps framerate limit
-	bullet->cLifespan = std::make_shared<CLifespan>(300);
+	bullet->cLifespan = std::make_shared<CLifespan>(60);
 }
 
 void Game::spawnSpecialWeapon(std::shared_ptr<Entity> spawningEntity)
@@ -157,15 +157,31 @@ void Game::sMovement()
 
 void Game::sLifeSpan()
 {
-	// TODO: scale alpha channel with remaining lifespan
-	
 	for (auto e : m_entities.getEntities())
 	{
 		if (e->cLifespan)
 		{
 			if (e->cLifespan->remaining > 0)
 			{
-				e->cLifespan->remaining--;
+				float alphaMultiplier = float(e->cLifespan->remaining) / float(e->cLifespan->total);
+				sf::Color fillColor = e->cShape->circle.getFillColor();
+				sf::Color outlineColor = e->cShape->circle.getOutlineColor();
+				e->cShape->circle.setFillColor(sf::Color
+				(
+					fillColor.r,
+					fillColor.g,
+					fillColor.b,
+					(255 * alphaMultiplier)
+				)
+				);
+				e->cShape->circle.setOutlineColor(sf::Color
+				(
+					outlineColor.r,
+					outlineColor.g,
+					outlineColor.b,
+					(255 * alphaMultiplier)
+				)
+				);
 			}
 			else
 			{
