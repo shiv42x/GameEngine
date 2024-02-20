@@ -163,7 +163,7 @@ void Game::sLifeSpan()
 		{
 			if (e->cLifespan->remaining > 0)
 			{
-				float alphaMultiplier = float(e->cLifespan->remaining) / float(e->cLifespan->total);
+				float alphaMultiplier = float(e->cLifespan->remaining) / float(e->cLifespan->total);		
 				sf::Color fillColor = e->cShape->circle.getFillColor();
 				sf::Color outlineColor = e->cShape->circle.getOutlineColor();
 				e->cShape->circle.setFillColor(sf::Color
@@ -182,6 +182,7 @@ void Game::sLifeSpan()
 					(255 * alphaMultiplier)
 				)
 				);
+				e->cLifespan->remaining--;
 			}
 			else
 			{
@@ -199,16 +200,13 @@ void Game::sCollision()
 
 void Game::sEnemySpawner()
 {
-	// TODO: code which implements enemy spaning
+	// TODO: code which implements enemy spawning
 	// use m_currentFrame - m_lastEnemySpawnTime to determine
 	// how long it has been since last enemy spawned
 }
 
 void Game::sRender()
 {
-	// TODO: change code to draw ALL entities
-	// currently draws player entity
-
 	m_window.clear();
 
 	// set pos of shape based on entity's transform->pos
