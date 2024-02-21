@@ -37,6 +37,7 @@ void Game::run()
 		sLifeSpan();
 		sRender();
 
+
 		// increment current frame
 		m_currentFrame++;
 	}
@@ -44,30 +45,24 @@ void Game::run()
 
 void Game::setPaused(bool paused)
 {
-
+	m_paused = true;
 }
 
 // respawn player in middle of screen
 void Game::spawnPlayer()
 {
 	// TODO: finish adding all properties of player with correct values
-
-	// We create every entity by calling EntityManager.addEntity(tag)
-	// This returns a std::shared_ptr<Entity>, so we use auto to save typing
+	// this returns a std::shared_ptr<Entity>, so we use auto to save typing
 	auto entity = m_entities.addEntity("player");
 
-
-	// Give entity Transform so it spawns at 200, 200 with velo 1, 1, angle 0
 	entity->cTransform = std::make_shared<CTransform>(
-		Vec2(200.0f, 200.0f),
+		Vec2(1280/2, 720/2),
 		Vec2(0.0f, 0.0f), 0.0f);
 
-	// Give entity shape 
+	// Give player entity shape 
 	entity->cShape = std::make_shared<CShape>(
-		32.0f, 8, sf::Color(10, 10, 10), sf::Color(255, 0, 0), 4.0f);
-
+		32.0f, 8, sf::Color(10, 10, 10), sf::Color(0, 255, 0), 4.0f);
 	entity->cInput = std::make_shared<CInput>();
-
 	m_player = entity;
 }
 
@@ -76,6 +71,30 @@ void Game::spawnEnemy()
 {
 	// TODO: make sure enemy is spawned properly with m_enemyConfig vars
 	// enemy must be spawned completely within the window
+	auto enemy = m_entities.addEntity("enemy");
+
+	// generate enemy properties
+	// TODO: seed 
+	int x = rand() % 1281;
+	int y = rand() % 721;
+	int sides = rand() % 8 + 3;
+
+
+	enemy->cTransform = std::make_shared<CTransform>(
+		Vec2(x, y),
+		Vec2(1.0f, 1.0f),
+		0.0f
+	);
+
+	enemy->cShape = std::make_shared<CShape>(
+		32.0f,
+		sides,
+		sf::Color(255, 0, 0, 255),
+		sf::Color(255, 255, 255, 255),
+		4.0f
+	);
+
+	//enemy->cLifespan = std::make_shared<CLifespan>(60);
 
 	// record last time an enemy spawned
 	m_lastEnemySpawnTime = m_currentFrame; 
@@ -92,10 +111,6 @@ void Game::spawnSmallEnemies(std::shared_ptr<Entity> spawningEntity)
 
 void Game::spawnBullet(std::shared_ptr<Entity> spawningEntity, const Vec2& mousePos)
 {
-	// TODO: implement the spawning of a bullet which travels to target
-	// bullet speed is given as scalar speed
-	// must set velocity by using formula
-	
 	float bulletSpeed = 10.0f;
 	Vec2 velocityVec = (mousePos - spawningEntity->cTransform->pos);
 	velocityVec.normalize();
@@ -150,8 +165,13 @@ void Game::sMovement()
 	m_player->cTransform->pos += playerVelocity;
 
 	// move entities
-	for (auto& e : m_entities.getEntities()) {
-		e->cTransform->pos += e->cTransform->velocity;
+	for (auto& e : m_entities.getEntities()) 
+	{	
+		// dont update player entities
+		if (e->tag() != "player")
+		{
+			e->cTransform->pos += e->cTransform->velocity;
+		}
 	}
 }
 
@@ -226,7 +246,7 @@ void Game::sRender()
 			e->cTransform->pos.y
 			);
 		e->cShape->circle.setRotation(
-			e->cTransform->angle
+			e->cTransform->angle += 1.0f
 		);
 		m_window.draw(e->cShape->circle);
 	}
@@ -293,6 +313,7 @@ void Game::sUserInput()
 			if (event.mouseButton.button == sf::Mouse::Right)
 			{
 				std::cout << "Right mouse clicked at " << event.mouseButton.x << ", " << event.mouseButton.y << '\n';
+				spawnEnemy();
 				// call spawnSpecialWeapon
 			}
 		}
