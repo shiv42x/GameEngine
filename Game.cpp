@@ -186,17 +186,6 @@ void Game::sMovement()
 		if (e->tag() != "player")
 		{
 			e->cTransform->pos += e->cTransform->velocity;
-
-			// if going out of screen, reverse respectve component to 'bounce'
-			if (((e->cTransform->pos.x - e->cShape->circle.getRadius()) <= 0) || ((e->cTransform->pos.x + e->cShape->circle.getRadius()) >= 1280))
-			{
-				e->cTransform->velocity.x = -(e->cTransform->velocity.x);
-			}
-
-			if (((e->cTransform->pos.y - e->cShape->circle.getRadius()) <= 0) || ((e->cTransform->pos.y + e->cShape->circle.getRadius()) >= 720))
-			{
-				e->cTransform->velocity.y = -(e->cTransform->velocity.y);
-			}
 		}
 	}
 }
@@ -242,6 +231,46 @@ void Game::sCollision()
 {
 	// TODO: implement all proper collisions between entities
 	// be sure to use collision radius, not shape radius
+	for (auto& e : m_entities.getEntities())
+	{
+		if (e->tag() != "player") 
+		{
+			// if going out of bounds, reverse respectve component to simulate 'bounce'
+			if (((e->cTransform->pos.x - e->cShape->circle.getRadius()) <= 0) || ((e->cTransform->pos.x + e->cShape->circle.getRadius()) >= 1280))
+			{
+				e->cTransform->velocity.x = -(e->cTransform->velocity.x);
+			}
+
+			if (((e->cTransform->pos.y - e->cShape->circle.getRadius()) <= 0) || ((e->cTransform->pos.y + e->cShape->circle.getRadius()) >= 720))
+			{
+				e->cTransform->velocity.y = -(e->cTransform->velocity.y);
+			}
+		}
+
+		// keep player within bounds
+		// better way to do this?
+		if (e->tag() == "player")
+		{
+			if ((e->cTransform->pos.x - e->cShape->circle.getRadius()) <= 0)
+			{
+				e->cTransform->pos.x = e->cShape->circle.getRadius();
+			}
+			if ((e->cTransform->pos.x + e->cShape->circle.getRadius()) >= 1280)
+			{
+				e->cTransform->pos.x = (1280 - e->cShape->circle.getRadius());
+			}
+			if ((e->cTransform->pos.y - e->cShape->circle.getRadius()) <= 0)
+			{
+				e->cTransform->pos.y = e->cShape->circle.getRadius();
+			}
+			if ((e->cTransform->pos.y + e->cShape->circle.getRadius()) >= 720)
+			{
+				e->cTransform->pos.y = (720 - e->cShape->circle.getRadius());
+			}
+
+		}
+
+	}
 }
 
 void Game::sEnemySpawner()
