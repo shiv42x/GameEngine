@@ -35,6 +35,7 @@ void Game::run()
 		sCollision();
 		sUserInput();
 		sLifeSpan();
+
 		sRender();
 
 
@@ -75,26 +76,39 @@ void Game::spawnEnemy()
 
 	// generate enemy properties
 	// TODO: seed 
-	int x = rand() % 1281;
-	int y = rand() % 721;
-	int sides = rand() % 8 + 3;
+	// range syntax => (max - min + 1) + min
+	int radius = rand() % 11 + 25;
 
+	// ensure spawns completely within window
+	int x = rand() % (1281 - radius) + radius;
+	int y = rand() % (721 - radius) + radius;
+
+	int sides = rand() % 6 + 3;
+	int x_velo = (rand() % 6) - 2;
+	int y_velo = (rand() % 6) - 2;
+
+	// if enemy spawns too close to player (within 50px), roll position again
+	if ((m_player->cTransform->pos.x - x < 50) && m_player->cTransform->pos.y - y < 50)
+	{
+		x = rand() % (1281 - radius) + radius;
+		y = rand() % (721 - radius) + radius;
+	}
 
 	enemy->cTransform = std::make_shared<CTransform>(
 		Vec2(x, y),
-		Vec2(1.0f, 1.0f),
+		Vec2(x_velo, y_velo),
 		0.0f
 	);
 
 	enemy->cShape = std::make_shared<CShape>(
-		32.0f,
+		radius,
 		sides,
-		sf::Color(255, 0, 0, 255),
-		sf::Color(255, 255, 255, 255),
+		sf::Color(150, 0, 0, 255),
+		sf::Color(175, 175, 175, 255),
 		4.0f
 	);
 
-	//enemy->cLifespan = std::make_shared<CLifespan>(60);
+	//enemy->cLifespan = std::make_shared<CLifespan>(360);
 
 	// record last time an enemy spawned
 	m_lastEnemySpawnTime = m_currentFrame; 
@@ -164,6 +178,7 @@ void Game::sMovement()
 	playerVelocity *= m_player->cTransform->moveSpeedMulti;
 	m_player->cTransform->pos += playerVelocity;
 
+
 	// move entities
 	for (auto& e : m_entities.getEntities()) 
 	{	
@@ -171,6 +186,17 @@ void Game::sMovement()
 		if (e->tag() != "player")
 		{
 			e->cTransform->pos += e->cTransform->velocity;
+
+			// if going out of screen, reverse respectve component to 'bounce'
+			if (((e->cTransform->pos.x - e->cShape->circle.getRadius()) <= 0) || ((e->cTransform->pos.x + e->cShape->circle.getRadius()) >= 1280))
+			{
+				e->cTransform->velocity.x = -(e->cTransform->velocity.x);
+			}
+
+			if (((e->cTransform->pos.y - e->cShape->circle.getRadius()) <= 0) || ((e->cTransform->pos.y + e->cShape->circle.getRadius()) >= 720))
+			{
+				e->cTransform->velocity.y = -(e->cTransform->velocity.y);
+			}
 		}
 	}
 }
@@ -220,9 +246,11 @@ void Game::sCollision()
 
 void Game::sEnemySpawner()
 {
-	// TODO: code which implements enemy spawning
-	// use m_currentFrame - m_lastEnemySpawnTime to determine
-	// how long it has been since last enemy spawned
+	// spawn enemy every 1.5 seconds
+	if (m_currentFrame - m_lastEnemySpawnTime > 90)
+	{
+		spawnEnemy();
+	}
 }
 
 void Game::sRender()
@@ -313,7 +341,6 @@ void Game::sUserInput()
 			if (event.mouseButton.button == sf::Mouse::Right)
 			{
 				std::cout << "Right mouse clicked at " << event.mouseButton.x << ", " << event.mouseButton.y << '\n';
-				spawnEnemy();
 				// call spawnSpecialWeapon
 			}
 		}
