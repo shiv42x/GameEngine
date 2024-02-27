@@ -60,10 +60,18 @@ void Game::spawnPlayer()
 		Vec2(1280/2, 720/2),
 		Vec2(0.0f, 0.0f), 0.0f);
 
-	// Give player entity shape 
+	// give player entity shape 
 	entity->cShape = std::make_shared<CShape>(
 		32.0f, 8, sf::Color(10, 10, 10), sf::Color(0, 255, 0), 4.0f);
+
+	// give player input controls
 	entity->cInput = std::make_shared<CInput>();
+
+	// give player collision radius
+	entity->cCollision = std::make_shared<CCollision>(
+		(entity->cShape->circle.getRadius() + entity->cShape->circle.getOutlineThickness())
+	);
+
 	m_player = entity;
 }
 
@@ -248,12 +256,12 @@ void Game::sCollision()
 		if (e->tag() != "player") 
 		{
 			// if going out of bounds, reverse respectve component to simulate 'bounce'
-			if (((e->cTransform->pos.x - e->cShape->circle.getRadius()) <= 0) || ((e->cTransform->pos.x + e->cShape->circle.getRadius()) >= 1280))
+			if (((e->cTransform->pos.x - e->cCollision->radius) <= 0) || ((e->cTransform->pos.x + e->cCollision->radius) >= 1280))
 			{
 				e->cTransform->velocity.x = -(e->cTransform->velocity.x);
 			}
 
-			if (((e->cTransform->pos.y - e->cShape->circle.getRadius()) <= 0) || ((e->cTransform->pos.y + e->cShape->circle.getRadius()) >= 720))
+			if (((e->cTransform->pos.y - e->cCollision->radius) <= 0) || ((e->cTransform->pos.y + e->cCollision->radius) >= 720))
 			{
 				e->cTransform->velocity.y = -(e->cTransform->velocity.y);
 			}
@@ -263,21 +271,21 @@ void Game::sCollision()
 		// better way to do this?
 		if (e->tag() == "player")
 		{
-			if ((e->cTransform->pos.x - e->cShape->circle.getRadius()) <= 0)
+			if ((e->cTransform->pos.x - e->cCollision->radius) <= 0)
 			{
-				e->cTransform->pos.x = e->cShape->circle.getRadius();
+				e->cTransform->pos.x = e->cCollision->radius;
 			}
-			else if ((e->cTransform->pos.x + e->cShape->circle.getRadius()) >= 1280)
+			else if ((e->cTransform->pos.x + e->cCollision->radius) >= 1280)
 			{
-				e->cTransform->pos.x = (1280 - e->cShape->circle.getRadius());
+				e->cTransform->pos.x = (1280 - e->cCollision->radius);
 			}
-			if ((e->cTransform->pos.y - e->cShape->circle.getRadius()) <= 0)
+			if ((e->cTransform->pos.y - e->cCollision->radius) <= 0)
 			{
-				e->cTransform->pos.y = e->cShape->circle.getRadius();
+				e->cTransform->pos.y = e->cCollision->radius;
 			}
-			else if ((e->cTransform->pos.y + e->cShape->circle.getRadius()) >= 720)
+			else if ((e->cTransform->pos.y + e->cCollision->radius) >= 720)
 			{
-				e->cTransform->pos.y = (720 - e->cShape->circle.getRadius());
+				e->cTransform->pos.y = (720 - e->cCollision->radius);
 			}
 		}
 	}
