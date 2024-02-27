@@ -110,6 +110,12 @@ void Game::spawnEnemy()
 
 	//enemy->cLifespan = std::make_shared<CLifespan>(360);
 
+	// give enemy collision radius
+	enemy->cCollision = std::make_shared<CCollision>(
+		(enemy->cShape->circle.getRadius() + enemy->cShape->circle.getOutlineThickness())
+	);
+
+
 	// record last time an enemy spawned
 	m_lastEnemySpawnTime = m_currentFrame; 
 }
@@ -145,6 +151,12 @@ void Game::spawnBullet(std::shared_ptr<Entity> spawningEntity, const Vec2& mouse
 
 	// lifespan of 60 = 1 sec because 60fps framerate limit
 	bullet->cLifespan = std::make_shared<CLifespan>(60);
+
+	// give bullet radius of collision
+	bullet->cCollision = std::make_shared<CCollision>(
+		(bullet->cShape->circle.getRadius() + bullet->cShape->circle.getOutlineThickness())
+	);
+
 }
 
 void Game::spawnSpecialWeapon(std::shared_ptr<Entity> spawningEntity)
@@ -271,20 +283,17 @@ void Game::sCollision()
 	}
 
 	// check collisions between enemy and bullets
-	// some clunkiness because border radius is not accounted for in collisions
-	// ... so sometimes bullet appears to pass through enemy entity
 	for (auto& enemy : m_entities.getEntities("enemy"))
 	{
 		for (auto& bullet : m_entities.getEntities("bullet"))
 		{
-			if (enemy->cTransform->pos.dist(bullet->cTransform->pos) <= (enemy->cShape->circle.getRadius() + bullet->cShape->circle.getRadius()))
+			if (enemy->cTransform->pos.dist(bullet->cTransform->pos) <= (enemy->cCollision->radius + bullet->cCollision->radius))
 			{
 				enemy->destroy();
 				//enemy->cLifespan = std::make_shared<CLifespan>(60);
 				bullet->destroy();
 				spawnSmallEnemies(enemy);
 			}
-		
 		}
 	}
 }
